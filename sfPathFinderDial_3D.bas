@@ -19,9 +19,9 @@ Attribute VB_Name = "sfPathFinder222_3D"
 Option Explicit
 
 Private Type point3D
-    x As Integer
-    y As Integer
-    z As Integer
+    X As Integer
+    Y As Integer
+    Z As Integer
 End Type
 
 Private Type lp         ' lp: List of Points
@@ -146,28 +146,27 @@ PathFinding:
     On Error GoTo 0
     ' Identifying the Start Point
     xyzfa = xyzFromAddress(StartAddress, NbY)
-    Xsp = xyzfa.x
-    Ysp = xyzfa.y
-    Zsp = xyzfa.z
+    Xsp = xyzfa.X
+    Ysp = xyzfa.Y
+    Zsp = xyzfa.Z
     
     ' Identifying the End Point
     xyzfa = xyzFromAddress(EndAddress, NbY)
-    Xep = xyzfa.x
-    Yep = xyzfa.y
-    Zep = xyzfa.z
+    Xep = xyzfa.X
+    Yep = xyzfa.Y
+    Zep = xyzfa.Z
     
     ' CCs initialization
     ' The starting point's CC is considered equal to zero. This CC serves as an index for the CCs() array.
-    ' CCcn = 0
-    ReDim CCs(CCcn)
+    ReDim CCs(1)
     ' For now, CCs(0) contains only a single Point3D, the starting point -> p3d(0)
-    ReDim CCs(CCcn).p3d(0)
+    ReDim CCs(0).p3d(0)
     ' Setting the x, y and z coordinates of the Point3D
-    CCs(CCcn).p3d(0).x = Xsp
-    CCs(CCcn).p3d(0).y = Ysp
-    CCs(CCcn).p3d(0).z = Zsp
+    CCs(0).p3d(0).X = Xsp
+    CCs(0).p3d(0).Y = Ysp
+    CCs(0).p3d(0).Z = Zsp
     ' CCs(0) contains a point: the starting point
-    CCs(CCcn).cp = True
+    CCs(0).cp = True
     ' The starting point is considered reached
     Nodes_rtbr(Xsp, Ysp, Zsp) = False
     
@@ -187,9 +186,9 @@ PathFinding:
     For i = 0 To ubn
         edv = Neighborhood(i)
         ' Each of the X, Y, and Z components can be -1, 0, or 1
-        NeighborhoodP3D(i).x = (edv Mod 3) - 1
-        NeighborhoodP3D(i).y = Int((edv Mod 9) / 3) - 1
-        NeighborhoodP3D(i).z = Int(edv / 9) - 1
+        NeighborhoodP3D(i).X = (edv Mod 3) - 1
+        NeighborhoodP3D(i).Y = Int((edv Mod 9) / 3) - 1
+        NeighborhoodP3D(i).Z = Int(edv / 9) - 1
     Next i
     
     
@@ -208,11 +207,11 @@ PathFinding:
             For n = 0 To ubn
                 edvP3D = NeighborhoodP3D(n)
                 ' if the neighbor remains to be reached...
-                If Nodes_rtbr(cn.x + edvP3D.x, cn.y + edvP3D.y, cn.z + edvP3D.z) Then
+                If Nodes_rtbr(cn.X + edvP3D.X, cn.Y + edvP3D.Y, cn.Z + edvP3D.Z) Then
                     ' Adding the X, Y AND Z components of the Current Node to those of the elementary displacement vector
-                    Xn = cn.x + edvP3D.x ' =Xn + (-1, 0 or 1)
-                    Yn = cn.y + edvP3D.y ' =Yn + (-1, 0 or 1)
-                    Zn = cn.z + edvP3D.z ' =Zn + (-1, 0 or 1)
+                    Xn = cn.X + edvP3D.X ' =Xn + (-1, 0 or 1)
+                    Yn = cn.Y + edvP3D.Y ' =Yn + (-1, 0 or 1)
+                    Zn = cn.Z + edvP3D.Z ' =Zn + (-1, 0 or 1)
                     edv = Neighborhood(n)
                     
                     If amoppm Then
@@ -223,16 +222,16 @@ PathFinding:
                         Select Case edv
                             ' Sharing an edge
                             Case 9, 11, 15, 17  ' xy plane
-                                If Nodes_IC(cn.x, Yn, cn.z) >= 0 And Nodes_IC(Xn, cn.y, cn.z) >= 0 Then GoSub Calcul
+                                If Nodes_IC(cn.X, Yn, cn.Z) >= 0 And Nodes_IC(Xn, cn.Y, cn.Z) >= 0 Then GoSub Calcul
                             Case 1, 7, 19, 25   ' yz plane
-                                If Nodes_IC(cn.x, cn.y, Zn) >= 0 And Nodes_IC(cn.x, Yn, cn.z) >= 0 Then GoSub Calcul
+                                If Nodes_IC(cn.X, cn.Y, Zn) >= 0 And Nodes_IC(cn.X, Yn, cn.Z) >= 0 Then GoSub Calcul
                             Case 3, 5, 21, 23   ' xz plane
-                                If Nodes_IC(cn.x, cn.y, Zn) >= 0 And Nodes_IC(Xn, cn.y, cn.z) >= 0 Then GoSub Calcul
+                                If Nodes_IC(cn.X, cn.Y, Zn) >= 0 And Nodes_IC(Xn, cn.Y, cn.Z) >= 0 Then GoSub Calcul
                             ' Sharing a vertex
                             Case 0, 2, 6, 8, 18, 20, 24, 26
-                                If Nodes_IC(cn.x, Yn, Zn) >= 0 And Nodes_IC(cn.x, cn.y, Zn) >= 0 And _
-                                   Nodes_IC(Xn, cn.y, Zn) >= 0 And Nodes_IC(Xn, cn.y, cn.z) >= 0 And _
-                                   Nodes_IC(Xn, Yn, cn.z) >= 0 And Nodes_IC(cn.x, Yn, cn.z) >= 0 Then GoSub Calcul
+                                If Nodes_IC(cn.X, Yn, Zn) >= 0 And Nodes_IC(cn.X, cn.Y, Zn) >= 0 And _
+                                   Nodes_IC(Xn, cn.Y, Zn) >= 0 And Nodes_IC(Xn, cn.Y, cn.Z) >= 0 And _
+                                   Nodes_IC(Xn, Yn, cn.Z) >= 0 And Nodes_IC(cn.X, Yn, cn.Z) >= 0 Then GoSub Calcul
                             ' Sharing a face
                             Case Else
                                 GoSub Calcul
@@ -259,11 +258,11 @@ PathFinding:
             ' Otherwise, we clear the list of points in CCs(CCcn) which is no longer needed
             Erase CCs(CCcn).p3d
             ' and we search for the next CCs(CCcn) that is not empty of points
-            For i = CCcn + 1 To CCcn + ICmax + 1
+            For i = CCcn + 1 To UBound(CCs)
                 If CCs(i).cp Then CCcn = i: Exit For ' if CCs(i) Contains Points
             Next i
             ' If the following condition is met, all reachable points in the grid have been visited without reaching the end point
-            If i > CCcn + ICmax + 1 Then  ' *** EXIT WITHOUT SOLUTION ***
+            If i > UBound(CCs) Then  ' *** EXIT WITHOUT SOLUTION ***
                 PathfindingTime = Timer - TimerTime '//
                 Exit Function
             End If
@@ -291,22 +290,21 @@ Calcul:
         ' if the Individual Cost of the neighbor is equal to zero, add this point to the Zero Values points list and set its Contains Points boolean to True
         If ZV.cp Then i = UBound(ZV.p3d) + 1 Else i = 0: ZV.cp = True
         ReDim Preserve ZV.p3d(i)
-        ZV.p3d(i).x = Xn
-        ZV.p3d(i).y = Yn
-        ZV.p3d(i).z = Zn
+        ZV.p3d(i).X = Xn
+        ZV.p3d(i).Y = Yn
+        ZV.p3d(i).Z = Zn
     Else    ' If the neighbor's individual cost is greater than 0
         ' the neighbor's Cumulative Cost is equal to the current node's CC plus the neighbor's Individual Cost
         CCn = CCcn + ICn
         If ICn > ICmax Then ICmax = ICn
         ' if the neighbor's CC is greater than the maximum CC known so far, resize CCs
         If CCn > CCmax Then CCmax = CCmax * 2 + ICmax: ReDim Preserve CCs(CCmax)
-        
         ' Adding the neighbor to the CCs(CCn) points list and setting its boolean flag to True
         If CCs(CCn).cp Then i = UBound(CCs(CCn).p3d) + 1 Else i = 0: CCs(CCn).cp = True
         ReDim Preserve CCs(CCn).p3d(i)
-        CCs(CCn).p3d(i).x = Xn
-        CCs(CCn).p3d(i).y = Yn
-        CCs(CCn).p3d(i).z = Zn
+        CCs(CCn).p3d(i).X = Xn
+        CCs(CCn).p3d(i).Y = Yn
+        CCs(CCn).p3d(i).Z = Zn
     End If
     Return
     
@@ -372,12 +370,12 @@ WorkSheetReading:
 End Function
 
 Public Function xyzFromAddress(ByVal Adresse$, ByVal NbY) As point3D
-    Dim row&, z&
+    Dim row&, Z&
     row = Range(Adresse).row
-    z = Int((row - Orow) / (NbY + 1)) + 1
-    xyzFromAddress.x = Range(Adresse).Column - Ocol + 1
-    xyzFromAddress.y = row - ((z - 1) * (NbY + 1)) - Orow + 1
-    xyzFromAddress.z = z
+    Z = Int((row - Orow) / (NbY + 1)) + 1
+    xyzFromAddress.X = Range(Adresse).Column - Ocol + 1
+    xyzFromAddress.Y = row - ((Z - 1) * (NbY + 1)) - Orow + 1
+    xyzFromAddress.Z = Z
 End Function
 
 
@@ -387,7 +385,7 @@ Sub Demo()
     Dim StartAddress$, EndAddress$
     Dim PropagationMode As Byte
     Dim Path As Variant
-    Dim x%, y%, z%
+    Dim X%, Y%, Z%
     Dim Vector As Byte
     Dim i&
     
@@ -417,27 +415,27 @@ Sub Demo()
     ' Iterating through Path from the last element (start point vector) to the first (last vector before the end point)
     For i = UBound(Path) To 0 Step -1
         Vector = Path(i)                    ' Vector extraction
-        x = x + (Vector Mod 3) - 1          ' Extracting and shifting the X component
-        y = y + Int((Vector Mod 9) / 3) - 1 ' Extracting and shifting the Y component
-        z = z + Int(Vector / 9) - 1         ' Extracting and shifting the Z component
-        Range(StartAddress).Offset(y + z * (NbY + 1), x).Interior.Color = vbGreen
+        X = X + (Vector Mod 3) - 1          ' Extracting and shifting the X component
+        Y = Y + Int((Vector Mod 9) / 3) - 1 ' Extracting and shifting the Y component
+        Z = Z + Int(Vector / 9) - 1         ' Extracting and shifting the Z component
+        Range(StartAddress).Offset(Y + Z * (NbY + 1), X).Interior.Color = vbGreen
     Next i
     ' Recoloring in cyan the end cell that was previously highlighted in green as part of the path
     Range(EndAddress).Interior.Color = vbCyan
 End Sub
 
 Private Sub demo_GenererateGrid(ByVal NbX%, ByVal NbY&, ByVal NbZ&)
-    Dim z%
+    Dim Z%
     Application.ScreenUpdating = False
     WsGrid.Cells.Clear
-    For z = 0 To NbZ - 1
-        With WsGrid.Range(Cells(z * (NbY + 1) + Orow, Ocol), Cells(z * (NbY + 1) + Orow + NbY - 1, Ocol + NbX - 1))
+    For Z = 0 To NbZ - 1
+        With WsGrid.Range(Cells(Z * (NbY + 1) + Orow, Ocol), Cells(Z * (NbY + 1) + Orow + NbY - 1, Ocol + NbX - 1))
             .Formula = "=INT(RAND()*51)"
             .Copy
             .PasteSpecial xlPasteValues
             
         End With
-    Next z
+    Next Z
     Application.CutCopyMode = False
     Application.ScreenUpdating = True
     WsGrid.Cells(Orow, Ocol).Select

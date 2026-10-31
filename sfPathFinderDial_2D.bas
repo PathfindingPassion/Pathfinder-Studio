@@ -21,8 +21,8 @@ Attribute VB_Name = "sfPathFinder222_2D"
 Option Explicit
 
 Private Type Point2D
-    x As Integer
-    y As Integer
+    X As Integer
+    Y As Integer
 End Type
 
 Private Type lp     ' lp: List of Points
@@ -133,15 +133,14 @@ PathFinding:
     
     ' CCs initialization
     ' The starting point's CC is considered equal to zero. This CC serves as an index for the CCs() array.
-    ' CCcn = 0
-    ReDim CCs(CCcn)
+    ReDim CCs(1)
     ' For now, CCs(0) contains only a single Point2D, the starting point -> p2d(0)
-    ReDim CCs(CCcn).p2d(0)
+    ReDim CCs(0).p2d(0)
     ' Setting the x and y coordinates of the Point2D
-    CCs(CCcn).p2d(0).x = Xsp
-    CCs(CCcn).p2d(0).y = Ysp
+    CCs(0).p2d(0).X = Xsp
+    CCs(0).p2d(0).Y = Ysp
     ' CCs(0) contains a point: the starting point
-    CCs(CCcn).cp = True
+    CCs(0).cp = True
     ' The starting point is considered reached
     Nodes_rtbr(Xsp, Ysp) = False
 
@@ -173,8 +172,8 @@ PathFinding:
             For n = 0 To ubn
                 edv = Neighborhood(n)
                 ' Adding the X and Y components of the Current Node to those of the elementary displacement vector
-                Xn = cn.x + (edv Mod 3) - 1     ' = cn.x + (-1, 0 or 1)
-                Yn = cn.y + Int(edv / 3) - 1    ' = cn.y + (-1, 0 or 1)
+                Xn = cn.X + (edv Mod 3) - 1     ' = cn.x + (-1, 0 or 1)
+                Yn = cn.Y + Int(edv / 3) - 1    ' = cn.y + (-1, 0 or 1)
                 
                 ' if the neighbor remains to be reached...
                 If Nodes_rtbr(Xn, Yn) Then
@@ -184,7 +183,7 @@ PathFinding:
                         GoSub Calcul
                     Else
                         ' Sprite perimeter mode: examining surrounding obstacles for diagonal movement (edv = 0, 2, 6 or 8)
-                        If Nodes_IC(cn.x, Yn) >= 0 And Nodes_IC(Xn, cn.y) >= 0 Then GoSub Calcul
+                        If Nodes_IC(cn.X, Yn) >= 0 And Nodes_IC(Xn, cn.Y) >= 0 Then GoSub Calcul
                     End If
                 End If
             Next n  ' we can move on to the next neighboring node
@@ -207,11 +206,11 @@ PathFinding:
             ' Otherwise, we clear the list of points in CCs(CCcn) which is no longer needed
             Erase CCs(CCcn).p2d
             ' and we search for the next CCs(CCcn) that is not empty of points
-            For i = CCcn + 1 To CCcn + ICmax + 1
+            For i = CCcn + 1 To UBound(CCs)
                 If CCs(i).cp Then CCcn = i: Exit For    ' if CCs(i) Contains Points
             Next i
             ' If the following condition is met, all reachable points in the grid have been visited without reaching the end point
-            If i > CCcn + ICmax + 1 Then  ' *** EXIT WITHOUT SOLUTION ***
+            If i > UBound(CCs) Then ' *** EXIT WITHOUT SOLUTION ***
                 PathfindingTime = Timer - TimerTime '//
                 Exit Function
             End If
@@ -234,13 +233,13 @@ Calcul:
     Nodes_edv(Xn, Yn) = edv
     ' Retrieving the Individual Cost of the Neighbor
     ICn = Nodes_IC(Xn, Yn)
-
+    
     If ICn = 0 Then
         ' if the Individual Cost of the neighbor is equal to zero, add this point to the Zero Values points list and set its Contains Points boolean to True
         If ZV.cp Then i = UBound(ZV.p2d) + 1 Else i = 0: ZV.cp = True
         ReDim Preserve ZV.p2d(i)
-        ZV.p2d(i).x = Xn
-        ZV.p2d(i).y = Yn
+        ZV.p2d(i).X = Xn
+        ZV.p2d(i).Y = Yn
     Else    ' If the neighbor's individual cost is greater than 0
         If ICn > ICmax Then ICmax = ICn
         ' the neighbor's Cumulative Cost is equal to the current node's CC plus the neighbor's Individual Cost
@@ -248,16 +247,17 @@ Calcul:
         
         ' if the neighbor's CC is greater than the maximum CC known so far, resize CCs
         If CCn > CCmax Then
-            a = CCmax * 2 + ICmax
-            If a > 268435454 Then a = 268435454 ' Max allowable value for an array type List of Points
-            CCmax = a: ReDim Preserve CCs(CCmax)
+            CCmax = CCmax * 2 + ICmax
+            If CCmax > 268435454 Then CCmax = 268435454 ' Max allowable value for an array type List of Points
+            ReDim Preserve CCs(CCmax)
         End If
+        
         
         ' Adding the neighbor to the CCs(CCn) points list and setting its boolean flag to True
         If CCs(CCn).cp Then i = UBound(CCs(CCn).p2d) + 1 Else i = 0: CCs(CCn).cp = True
         ReDim Preserve CCs(CCn).p2d(i)
-        CCs(CCn).p2d(i).x = Xn
-        CCs(CCn).p2d(i).y = Yn
+        CCs(CCn).p2d(i).X = Xn
+        CCs(CCn).p2d(i).Y = Yn
     End If
     Return
 
@@ -325,7 +325,7 @@ Sub Demo()
     Dim PropagationMode As Byte
     Dim Path As Variant
     Dim Vector As Byte
-    Dim x%, y%
+    Dim X%, Y%
 
     Set WsGrid = Feuil1     '# CodeName of the worksheet containing the grid
     NbX = 10                '# Number of columns in the grid
@@ -352,9 +352,9 @@ Sub Demo()
     ' Iterating through Path from the last element (start point vector) to the first (last vector before the end point)
     For i = UBound(Path) To 0 Step -1
         Vector = Path(i)               ' Vector extraction
-        x = x + (Vector Mod 3) - 1     ' Extracting and shifting the X component
-        y = y + Int(Vector / 3) - 1    ' Extracting and shifting the Y component
-        Range(StartAddress).Offset(y, x).Interior.Color = vbGreen
+        X = X + (Vector Mod 3) - 1     ' Extracting and shifting the X component
+        Y = Y + Int(Vector / 3) - 1    ' Extracting and shifting the Y component
+        Range(StartAddress).Offset(Y, X).Interior.Color = vbGreen
     Next i
 
     ' Recoloring in cyan the end cell that was previously highlighted in green as part of the path
