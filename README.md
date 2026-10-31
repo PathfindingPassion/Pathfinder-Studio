@@ -1,6 +1,6 @@
 # Pathfinder-Studio
 Pathfinder Studio is a high performance pathfinding engine collection
-# Pathfinder Studio v3.1 🧭
+# Pathfinder Studio v4.0 🧭
 
 A fast, interactive, and customizable 2D/3D pathfinding algorithm visualizer and solver built entirely in **Microsoft Excel (VBA)**.
 
